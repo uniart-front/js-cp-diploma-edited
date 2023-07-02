@@ -1,24 +1,33 @@
-let tickets = JSON.parse(sessionStorage.getItem(sessionStorage.getItem("data-seance-id")));// устанавливаем информацию
-let ticketWrapper = document.getElementsByClassName("ticket__info-wrapper")[0];
-ticketWrapper.getElementsByClassName("ticket__details ticket__title")[0].textContent = tickets.currentBuy["data-film-name"];
+import { sendRequest } from './sendRequest.js';
 
-let ticketChairs = ticketWrapper.getElementsByClassName("ticket__details ticket__chairs")[0];
-ticketChairs.textContent = "";
-Object.keys(tickets.currentBuy["chair"]).forEach((row,index) => {// ряд и место 1/2, 1/2...
-    tickets.currentBuy["chair"][row].forEach((place,index) => {
-        ticketChairs.textContent += `${row}/${place}`;
-        if(tickets.currentBuy["chair"][row].length - 1 > index){
-            ticketChairs.textContent += ", ";
-        }  
-    })
-    if(Object.keys(tickets.currentBuy["chair"]).length - 1 > index){
-        ticketChairs.textContent += ", ";
-    }
-})
-ticketWrapper.getElementsByClassName("ticket__details ticket__hall")[0].textContent = tickets.currentBuy["data-hall-name"].substr(tickets.currentBuy["data-hall-name"].length - 1);
-ticketWrapper.getElementsByClassName("ticket__details ticket__start")[0].textContent = tickets.currentBuy["data-seance-time"];
-ticketWrapper.getElementsByClassName("ticket__details ticket__cost")[0].textContent = tickets.currentBuy["cost"];
+const requestURL = 'https://jscp-diplom.netoserver.ru/';
 
-document.getElementsByClassName("acceptin-button")[0].addEventListener("mouseenter",function () {// смена указателя при наведении на кнопку
-    this.style.cursor = "pointer";
+let selectedMovie = JSON.parse(localStorage.getItem('selectedMovie'));
+let selectChairs = JSON.parse(localStorage.getItem('selectChairs'));
+
+const ticketTitle = document.querySelector('.ticket__title');
+ticketTitle.textContent = selectedMovie.movieName;
+
+const ticketChairs = document.querySelector('.ticket__chairs');
+ticketChairs.textContent = selectChairs.chairs;
+
+const ticketHall = document.querySelector('.ticket__hall');
+ticketHall.textContent = selectedMovie.hallName.slice(4);
+
+const ticketStart = document.querySelector('.ticket__start');
+ticketStart.textContent = selectedMovie.seanceTime;
+
+const ticketCost = document.querySelector('.ticket__cost');
+ticketCost.textContent = selectChairs.price;
+
+const acceptinButton = document.querySelector('.acceptin-button');
+
+acceptinButton.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  const params = `event=sale_add&timestamp=${selectedMovie.seanceStart}&hallId=${selectedMovie.hallId}&seanceId=${selectedMovie.seanceId}&hallConfiguration=${selectedMovie.hallConfig}`;
+
+  sendRequest('POST', requestURL, params);
+
+  location.href='ticket.html'
 })
