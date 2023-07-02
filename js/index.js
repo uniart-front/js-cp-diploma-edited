@@ -1,266 +1,142 @@
-import { createElement } from './create-elements.js';
-import { createDateElementHTML } from './create-elements.js';
-import { createDateElementDataAttributes } from './create-elements.js';
-import { sendRequest } from './sendRequest.js';
+const main = document.querySelector('main');
+const pageNav = document.querySelectorAll(".page-nav__day");
+const dayNum = document.querySelectorAll('.page-nav__day-number');
+
 
 document.addEventListener('DOMContentLoaded', () => {
-  localStorage.removeItem('selectedMovie');
-});
 
-const requestURL = 'https://jscp-diplom.netoserver.ru/';
+    // корректные дни
+    const week = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    let today = new Date();
 
-const pageNav = document.querySelector('.page-nav');
-const main = document.querySelector('.main');
-
-const currentDate = new Date();
-const currentYear = currentDate.getFullYear();
-const currentMonth = currentDate.getMonth();
-const currentDay = currentDate.getDate();
-const currentWeekday = currentDate.toLocaleString('ru-Ru', {
-  weekday: 'short',
-});
-
-let selectedYear = currentDate.getFullYear();
-let selectedMonth = currentDate.getMonth();
-let selectedDay = currentDate.getDate();
-
-let infoAboutSelectedMovie = {
-  movieName: '',
-  hallName: '',
-  hallId: '',
-  hallConfig: '',
-  priceStandart: '',
-  priceVip: '',
-  seanceId: '',
-  seanceTime: '',
-  seanceStart: '',
-  seanceDay: '',
-};
-
-const pageNavDayToday = createElement(
-  'a',
-  'page-nav__day page-nav__day_today page-nav__day_chosen',
-  pageNav
-);
-
-pageNavDayToday.href = '#';
-pageNavDayToday.innerHTML = createDateElementHTML(new Date());
-createDateElementDataAttributes(
-  pageNavDayToday,
-  currentYear,
-  currentMonth,
-  currentDay
-);
-
-for (let i = 1; i <= 6; i++) {
-  const pageNavDay = createElement('a', 'page-nav__day', pageNav);
-
-  pageNavDay.href = '#';
-  pageNavDay.innerHTML = createDateElementHTML(
-    new Date(currentYear, currentMonth, currentDay + i)
-  );
-  createDateElementDataAttributes(
-    pageNavDay,
-    currentYear,
-    currentMonth,
-    currentDay + i
-  );
-}
-
-const pageNavDayList = Array.from(document.querySelectorAll('.page-nav__day'));
-
-pageNavDayList.forEach((pageNavDay) => {
-  pageNavDay.addEventListener('click', (event) => {
-    event.preventDefault();
-    pageNavDayList.forEach((element) => {
-      element.classList.remove('page-nav__day_chosen');
-    });
-
-    pageNavDay.classList.add('page-nav__day_chosen');
-    selectedYear = pageNavDay.dataset.year;
-    selectedMonth = pageNavDay.dataset.month;
-    selectedDay = pageNavDay.dataset.day;
-
-    const movieSeancesTimeButtonArr = document.querySelectorAll(
-      '.movie-seances__time-button'
-    );
-
-    movieSeancesTimeButtonArr.forEach((button) => {
-      const movieSeancesTime = button.querySelector('.movie-seances__time');
-      const seanceTimeArr = movieSeancesTime.textContent.split(':');
-      const seanceTime = new Date(
-        currentYear,
-        currentMonth,
-        currentDay,
-        seanceTimeArr[0],
-        seanceTimeArr[1]
-      );
-
-      button.disabled =
-        currentDate.getTime() > seanceTime.getTime() &&
-        Number(selectedDay) === currentDay
-          ? true
-          : false;
-      // if (Number(selectedDay) !== currentDay) {
-      //   button.disabled = false;
-      // } else if (
-      //   currentDate.getTime() > seanceTime.getTime() &&
-      //   selectedDay == currentDay
-      // ) {
-      //   button.disabled = true;
-      // }
-    });
-  });
-});
-
-const params = 'event=update';
-
-sendRequest('POST', requestURL, params)
-  .then((data) => {
-    console.log(data);
-    const filmsArr = data.films.result;
-    const seancesArr = data.seances.result;
-    const hallsArr = data.halls.result;
-
-    filmsArr.forEach((film) => {
-      const filmElement = createElement('section', 'movie', main);
-      filmElement.dataset.id = film.film_id;
-
-      const movieInfo = createElement('div', 'movie__info', filmElement);
-      movieInfo.innerHTML = `
-          <div class="movie__poster">
-            <img
-              class="movie__poster-image"
-              alt="${film.film_name} постер"
-              src="${film.film_poster}"
-            />
-          </div>
-          <div class="movie__description">
-            <h2 class="movie__title">
-              ${film.film_name}
-            </h2>
-            <p class="movie__synopsis">
-              ${film.film_description}
-            </p>
-            <p class="movie__data">
-              <span class="movie__data-duration">${film.film_duration} минуты</span>
-              <span class="movie__data-origin">${film.film_origin}</span>
-            </p>
-          </div>
-        `;
-
-      const seancesFilmArr = seancesArr.filter((seance) => {
-        return seance.seance_filmid === film.film_id;
-      });
-
-      hallsArr.forEach((hall) => {
-        if (hall.hall_open === '1') {
-          const seancesFilmInHallArr = seancesFilmArr.filter((seance) => {
-            return seance.seance_hallid === hall.hall_id;
-          });
-
-          if (seancesFilmInHallArr.length > 0) {
-            const movieSeancesHall = createElement(
-              'div',
-              'movie-seances__hall',
-              filmElement
-            );
-            movieSeancesHall.innerHTML = `<h3 class="movie-seances__hall-title" data-id=${
-              hall.hall_id
-            }>Зал ${hall.hall_name.slice(3)}</h3>`;
-
-            const movieSeancesList = createElement(
-              'ul',
-              'movie-seances__list',
-              movieSeancesHall
-            );
-
-            seancesFilmInHallArr.forEach((seance) => {
-              const seanceTimeArr = seance.seance_time.split(':');
-              const seanceTime = new Date(
-                currentYear,
-                currentMonth,
-                currentDay,
-                seanceTimeArr[0],
-                seanceTimeArr[1]
-              );
-              const movieSeancesTimeBlock = createElement(
-                'li',
-                'movie-seances__time-block',
-                movieSeancesList
-              );
-
-              const movieSeancesTimeButton = createElement(
-                'button',
-                'movie-seances__time-button',
-                movieSeancesTimeBlock
-              );
-
-              movieSeancesTimeButton.disabled =
-                currentDate.getTime() > seanceTime.getTime() ? true : false;
-              movieSeancesTimeButton.innerHTML = `<a class="movie-seances__time" href="hall.html" data-seance-start=${seance.seance_start} data-seance-id=${seance.seance_id} disabled>${seance.seance_time}</a>`;
-            });
-          }
+    [...dayNum].forEach((elem, i) => {
+        const day = new Date(today.getTime() + (1000 * 60 * 60 * 24 * i));
+        elem.innerHTML = `${day.getDate()}`
+        elem.previousElementSibling.innerHTML = week[day.getDay()];
+        if (elem.previousElementSibling.textContent === 'Сб' || elem.previousElementSibling.textContent === 'Вс') {
+            elem.classList.add('page-nav__day_weekend');
+            elem.previousElementSibling.classList.add('page-nav__day_weekend');
         }
-      });
     });
 
-    const movieSeancesLinksList = Array.from(
-      document.querySelectorAll('.movie-seances__time')
-    );
+    let midnight = (today.getHours() * 3600000) + (today.getMinutes() * 60000) + (today.getSeconds() * 1000) + today.getMilliseconds();
+    let todayTime = today.getTime();
 
-    movieSeancesLinksList.forEach((movieSeancesLink) => {
-      movieSeancesLink.addEventListener('click', (event) => {
-        const movie = event.target.closest('.movie');
-        const movieTitle = movie.querySelector('.movie__title');
-        const hall = event.target.closest('.movie-seances__hall');
-        const hallTitle = hall.querySelector('.movie-seances__hall-title');
+    // запрос с разметкой
+    postResponse('https://jscp-diplom.netoserver.ru/', 'event=update')
+    .then((data) => {
+        let dataJson = JSON.stringify(data);
 
-        const seanceStartHours = Math.trunc(
-          Number(event.target.dataset.seanceStart) / 60
-        );
-        const seanceStartMinutes =
-          Number(event.target.dataset.seanceStart) % 60;
-        const seanceStartDate = new Date(
-          selectedYear,
-          selectedMonth,
-          selectedDay,
-          seanceStartHours,
-          seanceStartMinutes
-        );
+        let films = data.films.result;
+        let seances = data.seances.result;
+        let hallsOpen = data.halls.result.filter((hall) => hall.hall_open == 1);
+    
 
-        let hallConfig = '';
-        let priceStandart = '';
-        let priceVip = '';
+        localStorage.setItem('info', dataJson)
+        
 
-        hallsArr.forEach((hall) => {
-          if (hall.hall_id === hallTitle.dataset.id) {
-            hallConfig = hall.hall_config;
-            priceStandart = hall.hall_price_standart;
-            priceVip = hall.hall_price_vip;
-          }
+        films.forEach(films => {
+            let seancesHalls = '';
+
+            hallsOpen.forEach((hall) => {
+            const seancesCorrect = seances.filter((seance) => 
+            ((seance.seance_hallid === hall.hall_id) && (seance.seance_filmid === films.film_id)));
+
+                if (seancesCorrect.length > 0) {
+                    seancesHalls += `
+                    <div class="movie-seances__hall row">
+                    <h3 class="movie-seances__hall-title">${hall.hall_name}</h3>
+                    <ul class="movie-seances__list col-12">`
+                    seancesCorrect.forEach((seance) => {
+                        seancesHalls += `<li class="movie-seances__time-block">
+                       <a class="movie-seances__time" href="hall.html"
+                       data-film-name="${films.film_name}"
+                       data-film-id="${films.film_id}"
+                       data-hall-id="${hall.hall_id}"
+                       data-hall-name="${hall.hall_name}"
+                       data-price-vip="${hall.hall_price_vip}"
+                       data-price-standart="${hall.hall_price_standart}"
+                       data-seance-id="${seance.seance_id}" 
+                       data-seance-start="${seance.seance_start}"
+                       data-seance-time="${seance.seance_time}">${seance.seance_time}</a></li>`;
+                       });
+                       seancesHalls += `
+                       </ul>
+                       </div>
+                    `;
+                };
+            });
+
+            if (seancesHalls) {
+                main.innerHTML += `
+        <section class="movie container-fluid">
+          <div class="movie__info row justify-content-center">
+           <div class="movie__poster col-4">
+              <img class="movie__poster-image" alt="${films.film_name}" src="${films.film_poster}">
+            </div>
+            <div class="movie__description col-8"> 
+              <h2 class="movie__title">${films.film_name}</h2>
+              <p class="movie__synopsis">${films.film_description}</p>
+              <p class="movie__data">
+                <span class="movie__data-duration">${films.film_duration} минут |</span>
+                <span class="movie__data-origin text-decoration-underline">${films.film_origin}</span>
+              </p>
+            </div>
+          </div>
+          ${seancesHalls}
+          </section>
+                      `
+            }
+
+            // работа с временем
+            [...pageNav].forEach((elem, index) => {
+                // let msUTC = today.getUTCMilliseconds();
+                // console.log(msUTC)
+                  let msUTC = +today + (index * 86400000) - midnight;
+                  elem.dataset.dayTimestamp = Math.round(msUTC / 1000)
+                  
+                  elem.onclick = (event) => {
+                      // переключатель
+                        [...pageNav].forEach((item) => item.classList.remove('page-nav__day_chosen'));
+                        if (!elem.parentElement.classList.contains('page-nav__day')) {
+                            elem.classList.add('page-nav__day_chosen');
+                        }
+                    
+                      const timestampDay = getTimestampDay(event);
+                      updateSeances(timestampDay);
+
+                  };
+              });
+
+              const movieSeances = document.querySelectorAll('.movie-seances__time');
+              let updateSeances = (timestampDay) => {
+                [...movieSeances].forEach((movieSeance) => {
+                      const timestampSeanceDay = Number(movieSeance.dataset.seanceStart) * 60;
+                      const timestampSeance = timestampDay + timestampSeanceDay;
+                      const timestampNow = todayTime / 1000;
+                      
+                      movieSeance.dataset.seanceTimestamp = timestampSeance;
+                    //movieSeance.classList.toggle("acceptin-button-disabled", timeStampSeance - timeStampNow <= 0);
+                      (timestampSeance - timestampNow <= 0) ? movieSeance.classList.add('acceptin-button-disabled') : movieSeance.classList.remove('acceptin-button-disabled');
+                  });
+              }
+
+              const getTimestampDay = (event) => {
+                  let timestampDay = Number(event.target.dataset.dayTimestamp);
+                  if (isNaN(timestampDay)) {
+                      timestampDay = Number(event.target.closest(".page-nav__day").dataset.dayTimestamp);
+                  }
+                  return timestampDay;
+              }
+              pageNav[0].click();
+
+
+              [...movieSeances].forEach((elem) => {
+                  elem.addEventListener('click', event => {
+                    let selectSeance = JSON.stringify(event.target.dataset);
+                    sessionStorage.setItem('selectSeance', selectSeance)
+                  })
+              })
         });
-
-        infoAboutSelectedMovie.movieName = movieTitle.textContent.trim();
-        infoAboutSelectedMovie.hallName = hallTitle.textContent.trim();
-        infoAboutSelectedMovie.hallId = hallTitle.dataset.id;
-        infoAboutSelectedMovie.hallConfig = hallConfig;
-        infoAboutSelectedMovie.priceStandart = priceStandart;
-        infoAboutSelectedMovie.priceVip = priceVip;
-        infoAboutSelectedMovie.seanceId = event.target.dataset.seanceId;
-        infoAboutSelectedMovie.seanceTime = event.target.textContent.trim();
-        infoAboutSelectedMovie.seanceStart = String(
-          seanceStartDate.getTime() / 1000
-        );
-        infoAboutSelectedMovie.seanceDay = seanceStartDate.toLocaleString('ru-Ru', {
-          dateStyle: 'short',
-        })
-
-        localStorage.setItem(
-          'selectedMovie',
-          JSON.stringify(infoAboutSelectedMovie)
-        );
-      });
     });
-  })
-  .catch((err) => console.log(err));
+});
