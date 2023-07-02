@@ -1,23 +1,23 @@
-let hallInfo = sessionStorage.getItem("hallInfo");//информация о текущем зале
-let wrapper = document.getElementsByClassName("conf-step__wrapper")[0];//контейнер в котором хранится разметка посадочных мест
+let hallInfo = sessionStorage.getItem("hallInfo");//информация о зале
+let wrapper = document.getElementsByClassName("conf-step__wrapper")[0];//контейнер в котором хранятся места
 
-let sum = 0;// цена выбраных мест
+let sum = 0;// цена за место
 
 if(hallInfo!=="null"){// если нам сервер прислал разметку то делаем следующиее 
 
     hallInfo = hallInfo.replace(/\\/g, "");// преобразуем html разметку, которая пришла с сервера
     hallInfo = hallInfo.replace(/^"|"$/g, '');
-    wrapper.innerHTML = hallInfo;// устанавливаем разметку.
+    wrapper.innerHTML = hallInfo;// делаем разметку
 }
 else {
-    let hallConfig = sessionStorage.getItem("hall_config");// если с сервера пришёл "null", значит на этот сеанс, в этот зал билеты еще никто не купил, у мы из 1 запроса берем разметку
+    let hallConfig = sessionStorage.getItem("hall_config");// если с сервера пришёл "null", значит на этот сеанс, в этот зал билеты еще никто не купил, из 1 запроса берем разметку
     if(hallConfig) {
       wrapper.innerHTML = "";
       wrapper.innerHTML = hallConfig;
     }
 }
 
-let buyingInfoDescription = document.getElementsByClassName("buying__info-description")[0]; //меняем информаци о сеансе, берём данные которые сохраняли в sessionStroage, при запросе на сервер
+let buyingInfoDescription = document.getElementsByClassName("buying__info-description")[0]; //меняем информацию о показе фильма, берём данные которые сохраняли в sessionStroage, при запросе на сервер
 buyingInfoDescription.getElementsByClassName("buying__info-title")[0].textContent = sessionStorage.getItem("data-film-name");
 buyingInfoDescription.getElementsByClassName("buying__info-start")[0].textContent  = `Начало сеанса: ${sessionStorage.getItem("data-seance-time")}`;
 buyingInfoDescription.getElementsByClassName("buying__info-hall")[0].textContent = sessionStorage.getItem("data-hall-name");
@@ -27,13 +27,13 @@ document.getElementsByClassName("conf-step__legend-value price-vip")[0].textCont
 
 let wrapperChildren = wrapper.children;
 
-for(let i =0;i<wrapper.childElementCount; i++ ){ //перебираем каждое место и назначаем на него функцию клика
+for(let i =0;i<wrapper.childElementCount; i++ ){ // для места назначаем  функцию клика
     let chairs = wrapperChildren[i].children;
     for(let j =0; j<chairs.length;j++){
-        chairs[j].onclick = function () {// клик на место
-            if(!this.classList.contains("conf-step__chair_taken")) {// проверяем занято место или нет если не занято , то выбираем или отменяем выбор
+        chairs[j].onclick = function () {// клик место
+            if(!this.classList.contains("conf-step__chair_taken")) {
               if(this.classList.toggle("conf-step__chair_selected")){ 
-                if(this.classList.contains("conf-step__chair_standart")) { // добавляем цену за место
+                if(this.classList.contains("conf-step__chair_standart")) { 
                   sum+= Number(sessionStorage.getItem("data-price-standart"));
                 }
                 else {
@@ -41,7 +41,7 @@ for(let i =0;i<wrapper.childElementCount; i++ ){ //перебираем кажд
                 }
               }
               else {
-                if(this.classList.contains("conf-step__chair_standart")) { // добавляем цену за место
+                if(this.classList.contains("conf-step__chair_standart")) { //  цена за место
                     sum-= Number(sessionStorage.getItem("data-price-standart"));
                   }
                   else {
@@ -62,7 +62,7 @@ buyButton.addEventListener("mouseenter",function () {// смена указат�
   this.style.cursor = "pointer";
 })
 
-buyButton.onclick = function () { // отправляем выбранное место 
+buyButton.onclick = function () { // отправка места которое выбрали
   let chairsSelected =Array.from(wrapper.getElementsByClassName("conf-step__chair_selected"));// выбранные места
   if(chairsSelected.length) {
     let chair = {}; // объект который хранит ряд и места к этому ряду
@@ -102,7 +102,7 @@ buyButton.onclick = function () { // отправляем выбранное м�
         e.classList.toggle("conf-step__chair_taken");
         })
       sessionStorage.setItem("hallInfo",wrapper.innerHTML);
-      window.location.href = "payment.html";// переходим на след стр 
+      window.location.href = "payment.html";
     },data);
   }
   else{
@@ -112,7 +112,7 @@ buyButton.onclick = function () { // отправляем выбранное м�
   
 }
 
-let buyingInfoHint = document.getElementsByClassName('buying__info-hint')[0];// увеличение блока мест для маленьких экрановв
+let buyingInfoHint = document.getElementsByClassName('buying__info-hint')[0];
 let lastTouchEnd = 0;
 let scale = "scale(1.0)";
 let rem = "3rem";
@@ -130,8 +130,8 @@ buyingInfoHint.addEventListener('touchend', function(event) {
       rem = "3rem";
       marginTop = "0";
     }
-    let confStepWrapper = document.getElementsByClassName("conf-step__wrapper")[0];// увеличиваем
-    let confStepLegend = document.getElementsByClassName("conf-step__legend")[0];//добавляем блоку отступ от увеличенного 
+    let confStepWrapper = document.getElementsByClassName("conf-step__wrapper")[0];
+    let confStepLegend = document.getElementsByClassName("conf-step__legend")[0];
     confStepLegend.style.paddingTop = rem;
 
     confStepWrapper.style.transform = scale;
