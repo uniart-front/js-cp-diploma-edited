@@ -1,35 +1,36 @@
-let selectedMovie = JSON.parse(localStorage.getItem('selectedMovie'));
-let selectChairs = JSON.parse(localStorage.getItem('selectChairs'));
+let localSeanse = JSON.parse(localStorage.getItem('seance'));
+const buttonExit = document.getElementById('button-back')
 
-const ticketTitle = document.querySelector('.ticket__title');
-ticketTitle.textContent = selectedMovie.movieName;
+document.addEventListener('DOMContentLoaded', () => {
+    // шапка
+    document.querySelector('.ticket__title').innerHTML = localSeanse.filmName;
+    document.querySelector('.ticket__chairs').innerHTML = localSeanse.filmName;
+    document.querySelector('.ticket__hall').innerHTML = localSeanse.hallName.slice(3, 4); 
+    document.querySelector('.ticket__start').innerHTML = localSeanse.seanceTime;
+    let place = [];
+    for (item of localSeanse.salesPlaces) {
+        place.push(' ' + item.row + '/' + item.places)
+    }
+    document.querySelector('.ticket__chairs').innerHTML = place; 
 
-const ticketChairs = document.querySelector('.ticket__chairs');
-ticketChairs.textContent = selectChairs.chairs;
+    buttonExit.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.href = "index.html";
+        link.click();
+        })
 
-const ticketHall = document.querySelector('.ticket__hall');
-ticketHall.textContent = selectedMovie.hallName.slice(4);
+    let date = new Date(Number(localSeanse.seanceTimestamp * 1000));
+    let dayQR = date.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
+    let textQR = `
+    Дата: ${dayQR};
+    Начало сеанса: ${localSeanse.seanceTime};
+    Название фильма: ${localSeanse.filmName};
+    Зал: ${localSeanse.hallName.slice(3, 4)};
+    Ряд/Место ${place};
+    `
 
-const ticketStart = document.querySelector('.ticket__start');
-ticketStart.textContent = selectedMovie.seanceTime;
 
-const ticketInfoQr = document.querySelector('.ticket__info-qr');
-const stringQR = `Фильм: ${selectedMovie.movieName} Зал: ${selectedMovie.hallName} Места: ${selectChairs.chairs} Сеанс: ${selectedMovie.seanceId} Дата: ${selectedMovie.seanceDay}`;
-
-const qrcode = QRCreator(stringQR, {
-  mode: 4,
-  eccl: 0,
-  version: 8,
-  mask: 2,
-  image: 'png',
-  modsize: 4,
-  margin: 0,
-});
-
-const content = (qrcode) => {
-  return qrcode.error
-    ? `недопустимые исходные данные ${qrcode.error}`
-    : qrcode.result;
-};
-
-ticketInfoQr.append(content(qrcode));
+// qrcode
+const qrcode = QRCreator(textQR, { image: "SVG" });
+document.querySelector(".ticket__info-qr").append(qrcode.result);
+})
