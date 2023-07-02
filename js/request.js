@@ -1,22 +1,31 @@
-function request(callback,data) {
-    let url = "https://jscp-diplom.netoserver.ru/"; // URL для обращения
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); 
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          callback(xhr.responseText);
-        } 
-        else {
-          alert("Ошибка: " + xhr.status);
-        }
+/**
+ * Делает HTTP-запрос к серверу для получения данных.
+ *
+ * @param {string} metod Метод запроса.
+ * @param {string} url Адрес (URL)
+ * @param {string} body Тело запроса.
+ * @return {object} Promise, содержащий полученные данные.
+ */
+export function sendRequest(metod, url, body = null) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open(metod, url);
+    xhr.responseType = 'json';
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = () => {
+      if (xhr.status >= 400) {
+        reject(xhr.response);
+      } else {
+        resolve(xhr.response);
       }
     };
 
-    xhr.onerror = function() {
-      alert("Произошла ошибка сети или неправильный URL");
+    xhr.onerror = () => {
+      reject(xhr.response);
     };
 
-    xhr.send(data);
-  }
+    xhr.send(body);
+  });
+}
