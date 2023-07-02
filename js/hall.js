@@ -1,104 +1,91 @@
-import { sendRequest } from './sendRequest.js';
 
-const requestURL = 'https://jscp-diplom.netoserver.ru/';
+let seanceObject = JSON.parse(sessionStorage.getItem('selectSeance'));
+let localObject = JSON.parse(localStorage.getItem('info'));
+const button = document.querySelector('.acceptin-button');
+const buttonExit = document.getElementById('button-back')
+
 
 document.addEventListener('DOMContentLoaded', () => {
-  localStorage.removeItem('selectChairs');
-});
 
-const buyingSeanceTitle = document.querySelector('.buying__info-title');
-const buyingSeanceStart = document.querySelector('.buying__info-start');
-const buyingSeanceHall = document.querySelector('.buying__info-hall');
-const confStepWrapper = document.querySelector('.conf-step__wrapper');
-const priceStandart = document.querySelector('.price-standart');
-const priceVip = document.querySelector('.price-vip');
-const acceptinLink = document.querySelector('.acceptin-link');
-const acceptinButton = document.querySelector('.acceptin-button');
+document.querySelector('.buying__info-title').innerHTML = seanceObject.filmName;
+document.querySelector('.buying__info-start').innerHTML = 'Начало сеанса: ' + seanceObject.seanceTime;
+document.querySelector('.buying__info-hall').innerHTML = seanceObject.hallName;
+document.querySelector('.price-standart').innerHTML = seanceObject.priceStandart;
+document.querySelector('.price-vip').innerHTML = seanceObject.priceVip;
 
-const selectedMovie = JSON.parse(localStorage.getItem('selectedMovie'));
-const selectChairs = { chairs: [], price: 0 };
-
-buyingSeanceTitle.textContent = selectedMovie.movieName;
-buyingSeanceStart.textContent = `Начало сеанса: ${selectedMovie.seanceTime}`;
-buyingSeanceHall.textContent = selectedMovie.hallName;
-priceStandart.textContent = selectedMovie.priceStandart;
-priceVip.textContent = selectedMovie.priceVip;
-
-function updateLocal() {
-  localStorage.setItem('selectChairs', JSON.stringify(selectChairs));
-  localStorage.setItem('selectedMovie', JSON.stringify(selectedMovie));
+// места
+let hallConfig = '';
+let localHalls = localObject.halls.result
+for (item of localHalls) {
+  if (item.hall_id === seanceObject.hallId) {
+    hallConfig += item.hall_config
+  }
 }
 
-const params = `event=get_hallConfig&timestamp=${selectedMovie.seanceStart}&hallId=${selectedMovie.hallId}&seanceId=${selectedMovie.seanceId}`;
-
-sendRequest('POST', requestURL, params)
-  .then((data) => {
-    if (data) {
-      confStepWrapper.innerHTML = data;
+  // отправка запроса
+    postResponse('https://jscp-diplom.netoserver.ru/', `event=get_hallConfig&timestamp=${seanceObject.seanceTimestamp}&hallId=${seanceObject.hallId}&seanceId=${seanceObject.seanceId}`)
+    .then((data) => {
+      if (data === null) {
+        document.querySelector('.conf-step__wrapper').innerHTML = hallConfig
     } else {
-      confStepWrapper.innerHTML = selectedMovie.hallConfig;
+        document.querySelector('.conf-step__wrapper').innerHTML = data
     }
 
-    const confStepChairList = Array.from(
-      document.querySelectorAll('.conf-step__chair')
-    );
-    const confStepRowList = Array.from(
-      document.querySelectorAll('.conf-step__row')
-    );
+// выбор места
+const rows = document.querySelectorAll('.conf-step__row');
+button.setAttribute("disabled", 'true')
+let chairSelected = Array.from(document.querySelectorAll('.conf-step__row .conf-step__chair_selected'));
+for (item of rows) {
+  item.onclick = function(event) {
 
-    confStepRowList.forEach((row, index) => {
-      row.dataset.number = index + 1;
-      const chairsInRow = Array.from(row.querySelectorAll('.conf-step__chair'));
-      chairsInRow
-        .filter((chair) => {
-          return !chair.classList.contains('conf-step__chair_disabled');
-        })
-        .forEach((chair, index) => {
-          chair.dataset.number = index + 1;
-        });
-    });
+      let span = event.target.closest('span'); 
+      let spanStandart = span.classList.contains('conf-step__chair_standart');
+      let spanVip = span.classList.contains('conf-step__chair_vip');
 
-    confStepChairList.forEach((chair) => {
-      chair.addEventListener('click', () => {
-        chair.classList.toggle('conf-step__chair_selected');
-        const selectChair = chair.dataset.number;
-        const selectRow = chair.closest('.conf-step__row').dataset.number;
-        const priceSelectChair = chair.classList.contains(
-          'conf-step__chair_standart'
-        )
-          ? Number(selectedMovie.priceStandart)
-          : Number(selectedMovie.priceVip);
+      if (spanStandart == false && spanVip == false) return; 
+      span.classList.toggle('conf-step__chair_selected')
+      chairSelected = Array.from(document.querySelectorAll('.conf-step__row .conf-step__chair_selected'));
+      
+      // работа с кнопкой 
+      chairSelected.length ? button.removeAttribute("disabled") : button.setAttribute("disabled", 'true');
+    };
+  }
 
-        if (chair.classList.contains('conf-step__chair_selected')) {
-          selectChairs.price = selectChairs.price + priceSelectChair;
-          selectChairs.chairs.push(`${selectRow}/${selectChair}`);
-          acceptinButton.disabled = false;
-          updateLocal();
-        } else {
-          const index = selectChairs.chairs.indexOf(
-            `${selectRow}/${selectChair}`
-          );
-          selectChairs.chairs.splice(index, 1);
-          selectChairs.price = selectChairs.price - priceSelectChair;
-          if (selectChairs.chairs.length === 0) {
-            acceptinButton.disabled = true;
-          }
-          updateLocal();
+ button.addEventListener('click', event => {
+  event.preventDefault();
+  let chosenPlace = Array();
+  const rowsArray = Array.from(document.getElementsByClassName("conf-step__row"));
+  for (elem of rowsArray) {
+    const places = Array.from(elem.getElementsByClassName("conf-step__chair"));
+    for (item of places) {
+        if (item.classList.contains("conf-step__chair_selected")) {
+            item.classList.replace('conf-step__chair_selected', 'conf-step__chair_taken')
+            const chosenChairs = item.classList.contains("conf-step__chair_standart") ? 'standart' : 'vip'
+            chosenPlace.push({
+              'price': chosenChairs,
+              'row':  (rowsArray.findIndex(row => row === elem)) + 1,
+              'places': (places.findIndex(place => place === item)) + 1,
+            })
         }
-      });
-    });
-  })
-  .catch((err) => console.log(err));
+    }
+}
+const thisConfig = document.querySelector('.conf-step__wrapper').innerHTML;
+seanceObject.hallConfig = thisConfig;
+seanceObject.salesPlaces = chosenPlace;
+localStorage.setItem('seance', JSON.stringify(seanceObject));
+const link = document.createElement('a');
+link.href = "payment.html";
+link.click();
+ })
+})
 
-acceptinLink.addEventListener('click', () => {
-  const confStepChairSelectedList = document.querySelectorAll(
-    '.conf-step__chair_selected'
-  );
-  confStepChairSelectedList.forEach((chair) => {
-    chair.classList.remove('conf-step__chair_selected');
-    chair.classList.add('conf-step__chair_taken');
-  });
+buttonExit.addEventListener('click', () => {
+const link = document.createElement('a');
+link.href = "index.html";
+link.click();
+})
 
-  selectedMovie.hallConfig = confStepWrapper.innerHTML;
-  updateLocal();
-});
+})
+
+
+console.log(seanceObject)
