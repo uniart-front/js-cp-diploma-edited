@@ -1,33 +1,49 @@
-import { sendRequest } from './sendRequest.js';
+let localSeanse = JSON.parse(localStorage.getItem('seance'));
+console.log(localSeanse);
 
-const requestURL = 'https://jscp-diplom.netoserver.ru/';
+document.addEventListener('DOMContentLoaded', () => {
+    // шапка
+    document.querySelector('.ticket__title').innerHTML = localSeanse.filmName;
+    document.querySelector('.ticket__hall').innerHTML = localSeanse.hallName.slice(3, 4); 
+    document.querySelector('.ticket__start').innerHTML = localSeanse.seanceTime; 
+    document.querySelector('.ticket__title').innerHTML = localSeanse.filmName;
+// места
+    let place = [];
+    for (item of localSeanse.salesPlaces) {
+        place.push(' ' + item.row + '/' + item.places)
+    }
+    document.querySelector('.ticket__chairs').innerHTML = place;
 
-let selectedMovie = JSON.parse(localStorage.getItem('selectedMovie'));
-let selectChairs = JSON.parse(localStorage.getItem('selectChairs'));
 
-const ticketTitle = document.querySelector('.ticket__title');
-ticketTitle.textContent = selectedMovie.movieName;
+    // итоговая цена
+    let totalPrice = [];
 
-const ticketChairs = document.querySelector('.ticket__chairs');
-ticketChairs.textContent = selectChairs.chairs;
+    for (elem of localSeanse.salesPlaces) {
+        let standart = [];
+        let vip = [];
+        if (elem.price === 'vip') {
+            vip = localSeanse.priceVip;
+        }
+        if (elem.price === 'standart') {
+            standart = localSeanse.priceStandart
+        }
+        totalPrice.push(Number(standart) + Number(vip))
+    }
+    
 
-const ticketHall = document.querySelector('.ticket__hall');
-ticketHall.textContent = selectedMovie.hallName.slice(4);
+    let finishPrice = totalPrice.reduce((sum, elem) => {
+        return sum + elem;
+    }, 0);
 
-const ticketStart = document.querySelector('.ticket__start');
-ticketStart.textContent = selectedMovie.seanceTime;
+    document.querySelector('.ticket__cost').innerHTML = finishPrice
 
-const ticketCost = document.querySelector('.ticket__cost');
-ticketCost.textContent = selectChairs.price;
 
-const acceptinButton = document.querySelector('.acceptin-button');
 
-acceptinButton.addEventListener('click', (event) => {
-  event.preventDefault();
 
-  const params = `event=sale_add&timestamp=${selectedMovie.seanceStart}&hallId=${selectedMovie.hallId}&seanceId=${selectedMovie.seanceId}&hallConfiguration=${selectedMovie.hallConfig}`;
+// запрос
+    postResponse('https://jscp-diplom.netoserver.ru/', `event=sale_add&timestamp=${localSeanse.seanceTimestamp}&hallId=${localSeanse.hallId}&seanceId=${localSeanse.seanceId}&hallConfiguration=${localSeanse.hallConfig}`)
+        .then(() => {
 
-  sendRequest('POST', requestURL, params);
+        })
 
-  location.href='ticket.html'
 })
