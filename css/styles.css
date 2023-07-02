@@ -6,12 +6,12 @@
 }
 
 html {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 62.5%;
 }
 
 body {
-  background-image: url('../img/background.jpg');
+  background-image: url("../i/background.jpg");
   background-size: cover;
   background-attachment: fixed;
   background-position: right;
@@ -25,10 +25,9 @@ body {
   margin: 0;
   font-weight: 900;
   font-size: 3.4rem;
-  color: #ffffff;
+  color: #FFFFFF;
   text-transform: uppercase;
 }
-
 .page-header__title span {
   font-weight: 100;
 }
@@ -44,7 +43,6 @@ body {
   color: #000000;
   z-index: 10;
 }
-
 .page-nav .page-nav__day {
   flex-basis: calc(100% / 8);
   font-size: 1.2rem;
@@ -54,55 +52,42 @@ body {
   border-radius: 2px;
   text-decoration: none;
   color: #000000;
-  transition: all 0.3s;
 }
-
 .page-nav .page-nav__day + .page-nav__day {
   margin-left: 1px;
 }
-
 .page-nav .page-nav__day .page-nav__day-week::after {
   content: ',';
 }
-
 .page-nav .page-nav__day .page-nav__day-number::before {
   content: ' ';
 }
-
-.page-nav .page-nav__day .page-nav__day-week,
-.page-nav .page-nav__day .page-nav__day-number {
+.page-nav .page-nav__day .page-nav__day-week, .page-nav .page-nav__day .page-nav__day-number {
   display: block;
 }
-
 .page-nav .page-nav__day_chosen {
   flex-grow: 1;
-  background-color: #ffffff;
+  background-color: #FFFFFF;
   font-weight: 700;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
-
 .page-nav .page-nav__day_weekend {
-  color: #de2121;
+  color: #DE2121;
 }
-
 .page-nav .page-nav__day_next {
   text-align: center;
 }
-
 .page-nav .page-nav__day_next::before {
   content: '>';
   font-family: monospace;
   font-weight: 700;
   font-size: 2.4rem;
 }
-
 .page-nav .page-nav__day_today .page-nav__day-week::before {
   content: 'Сегодня';
   display: block;
 }
-
-.page-nav .page-nav__day_today .page-nav__day-week,
-.page-nav .page-nav__day_today .page-nav__day-number {
+.page-nav .page-nav__day_today .page-nav__day-week, .page-nav .page-nav__day_today .page-nav__day-number {
   display: inline;
 }
 
@@ -113,25 +98,23 @@ body {
   background: rgba(241, 235, 230, 0.95);
   color: #000000;
 }
-
-.movie__info {
+.movie .movie__info {
   display: flex;
-  flex-wrap: wrap;
 }
-
-.movie__poster {
+.movie .movie__poster {
   position: relative;
-  width: 80%;
-  margin: 0 auto;
+  width: 12.5rem;
+  height: 17.5rem;
+  /*    left: 1.5rem;
+      top: -1.5rem;*/
 }
-
-.movie__poster-image {
+.movie .movie__poster .movie__poster-image {
   position: relative;
   top: -3rem;
-  width: 100%;
+  width: 12.5rem;
+  height: 17.5rem;
 }
-
-.movie__poster::after {
+.movie .movie__poster::after {
   content: '';
   display: block;
   position: absolute;
@@ -142,71 +125,50 @@ body {
   border-right: 0 solid transparent;
   border-left: 0.7rem solid #772720;
 }
-
-.movie__description {
+.movie .movie__description {
   flex-grow: 1;
   padding-left: 1.5rem;
-  padding-bottom: 1rem;
 }
-
-.movie__title {
+.movie .movie__title {
   font-weight: 700;
   font-size: 1.6rem;
 }
-
-.movie__synopsis {
+.movie .movie__synopsis {
   font-size: 1.4rem;
   margin-top: 1rem;
 }
-
-.movie__data {
+.movie .movie__data {
   font-size: 1.4rem;
   font-weight: 300;
   margin-top: 1rem;
 }
-
-.movie-seances__hall + .movie-seances__hall {
+.movie .movie-seances__hall + .movie-seances__hall {
   margin-top: 2rem;
 }
-
-.movie-seances__hall-title {
+.movie .movie-seances__hall .movie-seances__hall-title {
   font-weight: 700;
   font-size: 1.6rem;
 }
-
-.movie-seances__list {
+.movie .movie-seances__hall .movie-seances__list {
   margin-top: 0.7rem;
   font-size: 0;
 }
-
-.movie-seances__time-block {
+.movie .movie-seances__hall .movie-seances__time-block {
   display: inline-block;
   margin-bottom: 4px;
 }
-
-.movie-seances__time-block:nth-last-of-type(n + 1) {
+.movie .movie-seances__hall .movie-seances__time-block:nth-last-of-type(n + 1) {
   margin-right: 4px;
 }
-
-.movie-seances__time {
+.movie .movie-seances__hall .movie-seances__time {
   display: block;
   padding: 8px;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.24), 0px 0px 2px rgba(0, 0, 0, 0.12);
   border-radius: 2px;
-  background-color: #ffffff;
+  background-color: #FFFFFF;
   color: #000000;
   text-decoration: none;
   font-size: 1.5rem;
-}
-
-.movie-seances__time-button {
-  border: inherit;
-  background: inherit;
-}
-
-.movie-seances__time-button:disabled a {
-  background: #7c7979;
-  pointer-events: none;
 }
 
 /* ~~~~~~~~~~~~ Кинозал ~~~~~~~~~~~~ */
@@ -216,24 +178,12 @@ body {
   box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.24), 0px 0px 3px rgba(0, 0, 0, 0.12);
   border-radius: 3px;
   border: none;
-  padding: 12px 25px;
+  padding: 12px 57px;
   text-transform: uppercase;
   font-weight: 500;
   font-size: 1.4rem;
-  background-color: #16a6af;
-  color: #ffffff;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.acceptin-button:hover {
-  background-color: #158c95;
-}
-
-.acceptin-link {
-  color: inherit;
-  font-size: inherit;
-  text-decoration: none;
+  background-color: #16A6AF;
+  color: #FFFFFF;
 }
 
 .buying {
@@ -247,35 +197,28 @@ body {
   justify-content: space-between;
   padding: 1.5rem;
 }
-
 .buying__info .buying__info-description {
   padding-right: 1.5rem;
 }
-
-.buying__info .buying__info-title,
-.buying__info .buying__info-hall {
+.buying__info .buying__info-title, .buying__info .buying__info-hall {
   font-size: 1.6rem;
   font-weight: 700;
 }
-
 .buying__info .buying__info-start {
   font-size: 1.4rem;
   font-weight: 300;
   margin: 0.7rem 0;
 }
-
 .buying__info .buying__info-hint {
   position: relative;
   font-weight: 300;
   font-size: 1.4rem;
   text-align: center;
 }
-
 .buying__info .buying__info-hint p {
   position: relative;
   width: 10rem;
 }
-
 .buying__info .buying__info-hint p::before {
   content: '';
   position: absolute;
@@ -284,20 +227,20 @@ body {
   display: block;
   width: 2.4rem;
   height: 3.2rem;
-  background-image: url(../img/hint.png);
+  background-image: url(../i/hint.png);
   background-size: 2.4rem 3.2rem;
 }
 
 .conf-step {
   text-align: center;
-  background-color: #171d24;
+  background-color: #171D24;
   padding: 1.5rem 3rem 1.5rem;
 }
 
 .conf-step__wrapper {
   font-size: 0;
   display: inline-block;
-  background-image: url(../img/screen.png);
+  background-image: url(../i/screen.png);
   background-position: top;
   background-repeat: no-repeat;
   background-size: 100%;
@@ -314,41 +257,35 @@ body {
 .conf-step__chair {
   display: inline-block;
   vertical-align: middle;
-  width: 1.7rem;
-  height: 1.7rem;
+  width: 2rem;
+  height: 2rem;
   border: 1px solid #525252;
   box-sizing: border-box;
   border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s;
 }
-
 .conf-step__chair:not(:first-of-type) {
   margin-left: 4px;
 }
 
 .conf-step__chair_disabled {
-  cursor: inherit;
   opacity: 0;
-  pointer-events: none;
 }
 
 .conf-step__chair_standart {
-  background-color: #ffffff;
+  background-color: #FFFFFF;
 }
 
 .conf-step__chair_vip {
-  background-color: #f9953a;
+  background-color: #F9953A;
 }
 
 .conf-step__chair_taken {
   background-color: transparent;
-  pointer-events: none;
 }
 
 .conf-step__chair_selected {
-  background-color: #25c4ce;
-  box-shadow: 0px 0px 4px #16a6af;
+  background-color: #25C4CE;
+  box-shadow: 0px 0px 4px #16A6AF;
   transform: scale(1.2);
 }
 
@@ -356,32 +293,27 @@ body {
   padding-top: 3rem;
   font-size: 1.4rem;
   font-weight: 300;
-  color: #ffffff;
+  color: #FFFFFF;
   display: flex;
   flex-wrap: nowrap;
   text-align: left;
 }
-
 .conf-step__legend .col {
   max-width: 25rem;
 }
-
 .conf-step__legend .col:first-of-type {
   padding-right: 1.5rem;
   margin-left: auto;
 }
-
 .conf-step__legend .col:last-of-type {
   margin-right: auto;
 }
-
 .conf-step__legend .conf-step__legend-price + .conf-step__legend-price {
   margin-top: 1rem;
 }
 
 /* ~~~~~~~~~~~~ Билет ~~~~~~~~~~~~ */
-.tichet__check,
-.ticket__info-wrapper {
+.tichet__check, .ticket__info-wrapper {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   background-color: rgba(241, 235, 230, 0.95);
@@ -392,7 +324,6 @@ body {
   padding-top: 2.5rem;
   padding-bottom: 2.5rem;
 }
-
 .tichet__check::before {
   content: '';
   display: block;
@@ -401,10 +332,9 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background-image: url(../img/border-top.png);
+  background-image: url(../i/border-top.png);
   background-size: 10px 3px;
 }
-
 .tichet__check::after {
   content: '';
   display: block;
@@ -413,7 +343,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background-image: url(../img/border-bottom.png);
+  background-image: url(../i/border-bottom.png);
   background-size: 10px 3px;
 }
 
@@ -423,7 +353,6 @@ body {
   padding-top: 2rem;
   padding-bottom: 3rem;
 }
-
 .ticket__info-wrapper::before {
   content: '';
   display: block;
@@ -432,10 +361,9 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background-image: url(../img/border-top.png);
+  background-image: url(../i/border-top.png);
   background-size: 10px 3px;
 }
-
 .ticket__info-wrapper::after {
   content: '';
   display: block;
@@ -444,7 +372,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background-image: url(../img/border-bottom.png);
+  background-image: url(../i/border-bottom.png);
   background-size: 10px 3px;
 }
 
@@ -452,14 +380,13 @@ body {
   font-weight: 700;
   font-size: 2.2rem;
   text-transform: uppercase;
-  color: #c76f00;
+  color: #C76F00;
 }
 
 .ticket__info {
   font-size: 1.6rem;
   color: #000000;
 }
-
 .ticket__info + .ticket__info {
   margin-top: 1rem;
 }
@@ -473,7 +400,6 @@ body {
   font-size: 1.4rem;
   margin-top: 3rem;
 }
-
 .ticket__hint + .ticket__hint {
   margin-top: 1rem;
 }
@@ -485,48 +411,13 @@ body {
   height: 20rem;
 }
 
-@media screen and (min-width: 360px) {
-  .conf-step__chair {
-    width: 2rem;
-    height: 2rem;
-  }
-}
-
 @media screen and (min-width: 479px) {
   .page-nav .page-nav__day {
     padding: 1rem 2rem;
   }
-
-  .acceptin-button {
-    padding: 12px 57px;
-  }
-
-  .movie .movie__info {
-    display: flex;
-    flex-wrap: nowrap;
-  }
-
-  .movie .movie__poster {
-    width: 12.5rem;
-  }
-
-  .movie .movie__poster .movie__poster-image {
-    position: relative;
-    top: -3rem;
-    width: 12.5rem;
-  }
 }
-
 @media screen and (min-width: 990px) {
-  .page-header,
-  nav,
-  main {
-    width: 990px;
-    margin: auto;
-  }
-
-  .movie,
-  .buying {
+  .movie, .buying {
     border-radius: 2px;
   }
 
@@ -535,14 +426,23 @@ body {
   }
 }
 
+@media (max-width: 285px) {
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
 /*================================================================*/
 
 .movie .movie-seances__hall .acceptin-button-disabled {
-  background-color: #888888;
-  pointer-events: none;
+ background-color: #c0c0bb;
+ pointer-events: none
 }
 
 .acceptin-button:disabled {
   background-color: #888888;
-  pointer-events: none;
-}
+  pointer-events: none
+ }
+
+
